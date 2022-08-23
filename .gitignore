@@ -1,0 +1,5 @@
+
+build
+*.uvprojx
+config.json
+*.exe
