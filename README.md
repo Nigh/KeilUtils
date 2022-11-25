@@ -10,7 +10,7 @@ To solve this problem, I have developed this tool.
 
 0. Put `KeilUtils.exe` in the same directory with `uvprojx` file
 1. Run `KeilUtils.exe init` to generate init config
-2. Run `KeilUtils.exe set ORIGIN_PATH MARCO_NAME` to replace your origin path to marco path
+2. Run `KeilUtils.exe set MARCO_NAME PATH` to replace your path to marco
 3. Run `KeilUtils.exe list` to check your settings
 4. Run `KeilUtils.exe path2macro` to replace the path to `$(MACRO)` macro
 5. Run `KeilUtils.exe macro2path` to replace the macro path back to your origin path
