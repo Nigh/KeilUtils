@@ -19,23 +19,7 @@ GCFLAGS 	= all=
 ASMFLAGS 	= all=
 
 .PHONY: all
-all: darwin linux win64
-
-.PHONY: darwin
-darwin: $(OSXBIN)
-	chmod +x $(OSXBIN)
-
-.PHONY: $(OSXBIN)
-$(OSXBIN):
-	GO111MODULE=$(GOMOD) GOARCH=$(GOARCH) GOOS=$(GOOSX) CGO_ENABLED=$(CGO_ENABLED) $(CC) $(CFLAGS) -o $(OSXBIN) -ldflags="$(LDFLAGS)" -gcflags="$(GCFLAGS)" -asmflags="$(ASMFLAGS)"
-
-.PHONY: linux
-linux: $(LINUXBIN)
-	chmod +x $(LINUXBIN)
-
-.PHONY: $(LINUXBIN)
-$(LINUXBIN):
-	GO111MODULE=$(GOMOD) GOARCH=$(GOARCH) GOOS=$(GOOSLINUX) CGO_ENABLED=$(CGO_ENABLED) $(CC) $(CFLAGS) -o $(LINUXBIN) -ldflags="$(LDFLAGS)" -gcflags="$(GCFLAGS)" -asmflags="$(ASMFLAGS)"
+all: win64
 
 .PHONY: win64
 win64: $(WINBIN)
