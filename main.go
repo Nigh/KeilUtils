@@ -4,7 +4,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,6 +15,8 @@ import (
 var marcoMap map[string]string
 var projectFile string
 
+const version string = "1.0.0"
+
 func getConfig() {
 	err := viper.ReadInConfig()
 	if err != nil {
@@ -26,7 +27,7 @@ func getConfig() {
 }
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
+	// rand.Seed(time.Now().UnixNano())
 	// viper.SetDefault("state", "0")
 	viper.SetDefault("macro", map[string]string{})
 	viper.SetDefault("project", "")
@@ -49,11 +50,23 @@ func projectReplace(fn func(string) string) {
 func main() {
 	flag.Parse()
 	if len(flag.Args()) == 0 {
-		// TODO: help info
+		fmt.Println("Command list:")
+		fmt.Println("version - get binary version")
+		fmt.Println("init - generate init config")
+		fmt.Println("set MARCO_NAME STRING - set a string marco in config")
+		fmt.Println("list - check your settings")
+		fmt.Println("path2macro - using config replace the STRING to $(MACRO)")
+		fmt.Println("macro2path - using config replace the $(MACRO) back to STRING")
+		fmt.Println("remove MARCO_NAME - delete the marco set in config")
+		fmt.Println("replace FOO BAR - replace all the string FOO to BAR in your project")
 		return
 	}
 	if len(flag.Args()) >= 1 {
 		cmd := flag.Arg(0)
+		if cmd == "version" {
+			fmt.Println("version " + version)
+			return
+		}
 		if cmd != "init" {
 			getConfig()
 		}
