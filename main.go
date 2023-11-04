@@ -15,7 +15,7 @@ import (
 var marcoMap map[string]string
 var projectFile string
 
-const version string = "1.0.0"
+const version string = "1.1.0"
 
 func getConfig() {
 	err := viper.ReadInConfig()
