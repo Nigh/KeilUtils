@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
-	"time"
 
 	"github.com/spf13/viper"
 )
@@ -47,6 +47,31 @@ func projectReplace(fn func(string) string) {
 	os.WriteFile(projectFile, []byte(projectStr), 0644)
 }
 
+func projectMacroScan(projectFileName string) []string {
+	project, err := os.ReadFile(projectFileName)
+	if err != nil {
+		panic(fmt.Errorf("fatal error read project file: %s", projectFileName))
+	}
+	projectStr := string(project)
+	r, _ := regexp.Compile(`\$\((\w+?)\)`)
+	macros := r.FindAllStringSubmatch(projectStr, -1)
+	var macrosSingle []string
+	for _, v := range macros {
+		var dup bool = false
+		for _, b := range macrosSingle {
+			if v[1] == b {
+				dup = true
+				break
+			}
+		}
+		if dup {
+			continue
+		}
+		macrosSingle = append(macrosSingle, v[1])
+	}
+	return macrosSingle
+}
+
 func main() {
 	flag.Parse()
 	if len(flag.Args()) == 0 {
@@ -61,6 +86,7 @@ func main() {
 		fmt.Println("replace FOO BAR - replace all the string FOO to BAR in your project")
 		return
 	}
+	marcoMap = make(map[string]string)
 	if len(flag.Args()) >= 1 {
 		cmd := flag.Arg(0)
 		if cmd == "version" {
@@ -77,8 +103,17 @@ func main() {
 					if !f.IsDir() {
 						ext := filepath.Ext(path)
 						if ext == ".uvprojx" {
-							fmt.Println("found project", f.Name())
+							fmt.Println("found project", "["+f.Name()+"]")
 							viper.Set("project", f.Name())
+							macros := projectMacroScan(f.Name())
+							for _, v := range macros {
+								_, ok := marcoMap[v]
+								if !ok {
+									marcoMap[v] = "$(" + v + ")"
+									fmt.Println("found unconfigured macro", "$("+v+")")
+								}
+							}
+							viper.Set("macro", marcoMap)
 							viper.WriteConfig()
 							return errors.New("found project")
 						}
