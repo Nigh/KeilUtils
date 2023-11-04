@@ -1,0 +1,3 @@
+[submodule "compile-toolset"]
+	path = compile-toolset
+	url = https://github.com/Nigh/ahk-compile-toolset
