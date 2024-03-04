@@ -1,20 +1,22 @@
-# KeilUtils
+# MacroUtil
 
-> Use macro path in Keil project
+> previous `KeilUtils`
 
-Because `keil` does not support macro paths, we will encounter path problems when opening `keil` projects in different environments.
-And paths that cannot be represented by variables can cause a lot of trouble when people collaborate using version control tools like git.
-To solve this problem, I have developed this tool.
+This project started out as a way to use macro paths in Keil projects, since Keil does not support macro paths.  
+本项目一开始是为了在Keil项目中使用宏路径，因为Keil并不支持宏路径。
+
+This project was created to allow IDEs that do not support macro paths to continue to work in different environments.  
+为了让这些不支持宏路径的IDE能够在不同的环境下继续运作，这个项目应运而生。
 
 ## Usage
 
-**At first, put `KeilUtils.exe` in the same directory with `uvprojx` file**
-
-- `KeilUtils.exe version` to get binary version
-- `KeilUtils.exe init` to generate init config
-- `KeilUtils.exe set MARCO_NAME STRING` to set a string marco in config
-- `KeilUtils.exe list` to check your settings
-- `KeilUtils.exe path2macro` using config replace the STRING to `$(MACRO)`
-- `KeilUtils.exe macro2path` using config replace the `$(MACRO)` back to STRING
-- `KeilUtils.exe remove MARCO_NAME` to delete the marco set before
-- `KeilUtils.exe replace foo bar` to replace all the string `foo` to `bar` in your project
+- `MacroUtil.exe version` show binary version
+- `MacroUtil.exe init` get init info
+- `MacroUtil.exe set MARCO_NAME STRING` set a string marco in config
+- `MacroUtil.exe list` list all your settings
+- `MacroUtil.exe path2macro` replace the STRING to `$(MACRO)` in your `filelist`
+- `MacroUtil.exe macro2path` replace the `$(MACRO)` back to STRING in your `filelist`
+- `MacroUtil.exe remove MARCO_NAME` to delete the marco set before
+- `MacroUtil.exe add FILE_PATH` add a file to your `filelist`
+- `MacroUtil.exe ignore FILE_PATH` remove a file in your `filelist`
+- `MacroUtil.exe replace foo bar` to replace all the string `foo` to `bar` in your files
