@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -13,24 +12,22 @@ import (
 )
 
 var marcoMap map[string]string
-var projectFile string
+var projectFiles []string
 
-const version string = "1.1.0"
+const version string = "1.1.1"
 
 func getConfig() {
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %s", err))
 	}
-	projectFile = viper.GetString("project")
+	projectFiles = viper.GetStringSlice("projects")
 	marcoMap = viper.GetStringMapString("macro")
 }
 
 func init() {
-	// rand.Seed(time.Now().UnixNano())
-	// viper.SetDefault("state", "0")
 	viper.SetDefault("macro", map[string]string{})
-	viper.SetDefault("project", "")
+	viper.SetDefault("projects", []string{})
 	viper.SetConfigType("json")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
@@ -38,13 +35,17 @@ func init() {
 }
 
 func projectReplace(fn func(string) string) {
-	project, err := os.ReadFile(projectFile)
-	if err != nil {
-		panic(fmt.Errorf("fatal error read project file: %s", projectFile))
+	for _, v := range projectFiles {
+		fmt.Printf("-------------------------\nFile:[%s]\n", v)
+		project, err := os.ReadFile(v)
+		if err != nil {
+			panic(fmt.Errorf("fatal error read project file: %s", v))
+		}
+		projectStr := string(project)
+		projectStr = fn(projectStr)
+		os.WriteFile(v, []byte(projectStr), 0644)
 	}
-	projectStr := string(project)
-	projectStr = fn(projectStr)
-	os.WriteFile(projectFile, []byte(projectStr), 0644)
+	fmt.Println("-------------------------")
 }
 
 func projectMacroScan(projectFileName string) []string {
@@ -98,14 +99,15 @@ func main() {
 		}
 		switch cmd {
 		case "init":
+			projectsFound := make([]string, 0)
 			filepath.Walk(".",
 				func(path string, f os.FileInfo, err error) error {
 					if !f.IsDir() {
 						ext := filepath.Ext(path)
-						if ext == ".uvprojx" {
+						if ext == ".uvprojx" || filepath.Base(path) == "CallKeilDll.xml" {
 							fmt.Println("found project", "["+f.Name()+"]")
-							viper.Set("project", f.Name())
-							macros := projectMacroScan(f.Name())
+							projectsFound = append(projectsFound, path)
+							macros := projectMacroScan(path)
 							for _, v := range macros {
 								_, ok := marcoMap[v]
 								if !ok {
@@ -113,15 +115,17 @@ func main() {
 									fmt.Println("found unconfigured macro", "$("+v+")")
 								}
 							}
-							viper.Set("macro", marcoMap)
-							viper.WriteConfig()
-							return errors.New("found project")
 						}
 					}
 					return nil
 				})
+			viper.Set("projects", projectsFound)
+			viper.Set("macro", marcoMap)
+			viper.WriteConfig()
 		case "list":
-			fmt.Println("project", projectFile)
+			for _, v := range projectFiles {
+				fmt.Println("project file", v)
+			}
 			for k, v := range marcoMap {
 				k = strings.ToUpper(k)
 				fmt.Println("$(" + k + ")=" + v)
