@@ -1,5 +1,5 @@
 DIR 		= ./build
-EXECUTABLE  	= KeilUtils
+EXECUTABLE  	= MacroUtil
 
 GOARCH		= amd64
 GOOSWIN		= windows
