@@ -35,13 +35,14 @@ const version string = "2.0.0"
 const macroPrefix = "$("
 const macroSuffix = ")"
 
-func init() {
-	fileExist := func(filename string) bool {
-		if _, err := os.Stat(filename); os.IsNotExist(err) {
-			return false
-		}
-		return true
+func fileExist(filename string) bool {
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		return false
 	}
+	return true
+}
+
+func init() {
 	if !fileExist("macros.json") {
 		fmt.Println("macros.json" + " not exist, create it")
 		os.WriteFile("macros.json", []byte("{}"), 0644)
@@ -105,6 +106,10 @@ func cfgPush() {
 func macroReplace(fn func(string) string) {
 	for _, v := range cfg.Files {
 		fmt.Printf("-------------------------\nFile:[%s]\n", v.Path)
+		if !fileExist(v.Path) {
+			fmt.Println("[ERROR] file not exist")
+			os.Exit(2)
+		}
 		content, err := os.ReadFile(v.Path)
 		if err != nil {
 			panic(fmt.Errorf("fatal error read file: %s", v))
